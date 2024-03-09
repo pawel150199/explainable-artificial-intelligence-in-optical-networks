@@ -1,0 +1,14 @@
+\begin{tabular}{lrllll}
+\hline
+ Parameter             &   CART & SVR     & KNN   & RF    & LR    \\
+\hline
+ highestSlot           &  0.009 & 0.002   & 0.005 & 0.600 & 0.004 \\
+                       &  4     & 1, 4, 5 & 4     & ---   & 1, 4  \\
+ avgHighestSlot        &  0.01  & 0.001   & 0.001 & 0.660 & 0.003 \\
+                       &  4     & 1, 4, 5 & all   & ---   & 1, 4  \\
+ sumOfSlots            &  0.009 & 0.001   & 0.001 & 0.647 & 0.003 \\
+                       &  4     & 1, 4, 5 & all   & ---   & 1, 4  \\
+ avgActiveTransceivers &  0.01  & 0.001   & 0.001 & 0.625 & 0.003 \\
+                       &  4     & 1, 4, 5 & all   & ---   & 1, 4  \\
+\hline
+\end{tabular}

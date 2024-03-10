@@ -26,9 +26,9 @@ We can check following ways:
   
 * ANOVA F-value -> ANOVA F-value method estimates the degree of linearity between the input feature (i.e., predictor) and the output feature. A high F-value indicates high degree of linearity and a low F-value indicates low degree of linearity. The main disadvantage of using ANOVA F-value is it only captures linear relationships between input and output feature. In other words, any non-linear relationships cannot be detected by F-value. In sklearn we have `f_classif` function.
   
-* Features importances from DecisionTree Regressor -> During split between two features in spliting in Decision Tree algorithm measure feature importance and this information can be usefull in case of selection features.
+*   from DecisionTree Regressor -> During split between two features in spliting in Decision Tree algorithm measure feature importance and this information can be usefull in case of selection features.
   
-* Shapley values -> They also give us information about feature importance.
+### We can use Shapley values to analyse feature importance in specified model
 
 ## Troubleshooting
 If you have issue with modules using in this code export enviroment variable which can fix your issue:

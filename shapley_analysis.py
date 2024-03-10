@@ -47,7 +47,7 @@ def plot_shapley_values(dataset: str, estimator: Any, image_name: str, random_st
         shap_values = ex.shap_values(x_df)
         shap.summary_plot(shap_values, x_df, max_display=5, show=False)
         fig = plt.gcf()
-        fig.savefig(f'images/{image_name}-{parameters[i]}.png')
+        fig.savefig(f'images/{image_name}_{parameters[i]}.png')
         plt.close(fig)
 
         #shap.plots.violin(shap_values, x_df, show=False)
@@ -82,9 +82,7 @@ def get_parameters():
 
 def main():
     args = get_parameters()
-    plot_shapley_values(dataset="Euro28", estimator=LinearRegression, image_name=None, random_state=RANDOM_STATE)
+    plot_shapley_values(dataset=args.dataset, estimator=args.estimator, image_name=args.image_name, random_state=RANDOM_STATE)
 
 if __name__ == "__main__":
     main()
-
-

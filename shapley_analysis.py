@@ -30,6 +30,16 @@ def plot_shapley_values(dataset: str, estimator: Any, image_name: str, random_st
         "avgActiveTransceivers",
     ]
 
+    estimators = {
+        "SVR": SVR,
+        "LinearRegression": LinearRegression,
+        "KNeighborsRegressor": KNeighborsRegressor,
+        "DecisionTreeRegressor": DecisionTreeRegressor,
+        "RandomForestRegressor": RandomForestRegressor,
+    }
+
+    estimator = estimators[estimator]
+
     X, y = import_data(dataset)
     X_t = X.reshape((100, 300))
     for i in range(len(parameters)):

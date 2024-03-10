@@ -5,10 +5,16 @@ The data was captured in Europe - dataset Euro28 and in USA - dataset US26 in op
 
 ## Euro28
 
-<img src="img/euro28.png" width="500px" height="450px"><img>
+![euro28](./images/euro28.png)
 
 ## US26
 
-<img src="img/us26.png" width="500px" height="450px"><img>
+![us26](./images/us26.png)
+
+## How run experiment
+Run `evaluation.py` script with specific options.
+<br></br>
+![usage](./images/usage.png)
+
 
 

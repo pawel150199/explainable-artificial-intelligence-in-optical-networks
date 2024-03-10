@@ -1,9 +1,8 @@
-from typing import Any
-import colorlog
-import argparse
+import sys
 import logging
+from typing import Any
 
-def configureLogger() -> Any:
+def configureLogger(debug=False) -> Any:
     """
     Function configure logger
 
@@ -18,23 +17,10 @@ def configureLogger() -> Any:
         logger.info("Logger is working fine!")
 
     """  
-
-    logger = colorlog.getLogger()
-    logger.setLevel(logging.INFO)
-
-    handler = colorlog.StreamHandler()
-    handler.setFormatter(
-        colorlog.ColoredFormatter(
-            "%(log_color)s%(levelname)s - %(message)s",
-            log_colors={
-                'INFO': 'green',
-                'WARNING': 'yellow',
-                'ERROR': 'red',
-                'CRITICAL': 'red,bg_white',
-            },
-            secondary_log_colors={},
-            style='%'
-        )
-    )
+    logger= logging.getLogger('xai-experiment')
+    logger.setLevel(logging.DEBUG if debug else logging.INFO)
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setFormatter(logging.Formatter("%(asctime)s — %(levelname)s — %(message)s", "%Y-%M-%d %H:%M:%S"))
     logger.addHandler(handler)
-    return  logger
+    
+    return logger

@@ -1,9 +1,9 @@
-from hashlib import scrypt
 import os
 import time
 import argparse
 import warnings
 import numpy as np
+from tqdm import tqdm
 from tabulate import tabulate
 from scipy.stats import ttest_ind
 from sklearn.metrics import mean_absolute_percentage_error
@@ -40,7 +40,22 @@ parameters = [
 
 metrics = {"MAPE": mean_absolute_percentage_error}
 
-def experiment(datasetname: str, n_splits: int=5, n_repeats: int=2, measure_time: bool=True, result_name: str="experiment", save: bool=True):
+def experiment(datasetname: str, n_splits: int, n_repeats: int, result_name: str, save: bool, measure_time: bool):
+
+    if n_splits is None:
+        n_splits = 5
+    
+    if n_repeats is None:
+        n_repeats = 2
+    
+    if result_name is None:
+        result_name = "experiment"
+    
+    if save is None:
+        save = True
+    
+    if measure_time is None:
+        measure_time = True
 
     X, y = import_data(datasetname)
 
@@ -60,7 +75,7 @@ def experiment(datasetname: str, n_splits: int=5, n_repeats: int=2, measure_time
         )
     )
 
-    for param_id in range(4):
+    for param_id in tqdm(range(4), desc="Predicted parameter"):
         y_selected = y[:, param_id]
         for fold_id, (train, test) in enumerate(rskf.split(X, y_selected)):
             for clf_id, clf_name in enumerate(clfs):
@@ -84,10 +99,16 @@ def experiment(datasetname: str, n_splits: int=5, n_repeats: int=2, measure_time
 
     return scores
 
-def statistic_test(scores: np.array, tablename: str="experiment", alpha: float=0.05):
+def statistic_test(scores: np.array, tablename: str, alpha: float):
     std_fmt=None
     nc="---"
     db_fmt="%s"
+
+    if tablename is None:
+        tablename = "experiment"
+
+    if alpha is None:
+        alpha = 0.05
     
     mean = np.mean(scores, axis=1)
     std = np.std(scores, axis=1)
@@ -132,6 +153,7 @@ def get_parameters():
         "--evaluation",
         "-e",
         help="Do experiment evaluation",
+        action='store_true',
         required=True
     )
 
@@ -139,13 +161,14 @@ def get_parameters():
         "--statistic_test",
         "-s",
         help="Do statistic test",
+        action='store_true',
         required=True
     )
 
     parser.add_argument(
         "--read_scores",
         "-r",
-        type=str
+        type=str,
         help="Path to scores to read for statistic evaluation"
     )
     
@@ -158,7 +181,7 @@ def get_parameters():
     )
 
     parser.add_argument(
-        "--resultname",
+        "--result_name",
         help="Name of the result of the experiment",
         type=str
     )
@@ -189,11 +212,13 @@ def get_parameters():
 
     parser.add_argument(
         "--measure_time",
+        action='store_true',
         help="Measure time of execution each algoritm"
     )
 
     parser.add_argument(
         "--save_results",
+        action='store_true',
         help="Save result of experiment evaluation"
     )
 
@@ -211,44 +236,33 @@ def main():
 
     args = get_parameters()
 
-    if os.path.exists(args.data):
-        datasetname = args.data
+    if os.path.exists(args.dataset):
+        datasetname = args.dataset
     else:
         logger.error("Dataset path does not exist! Try again.")
         exit(1)
     
-    if args.result_name:
-        result_name = args.result_name
-
     if not args.measure_time:
         measure_time = False
+    else:
+        measure_time = True
     
-    if not args.save:
+    if not args.save_results:
         save = False
-    
-    if args.n_splits:
-        n_splits = args.n_splits
-    
-    if args.n_repeats:
-        n_repeats = args.n_repeats
-    
-    if args.alpha:
-        alpha = args.alpha
-    
-    if args.tablename:
-        tablename = args.tablename
-    
+    else:
+        save = True
 
-    
     if args.evaluation:
         logger.info("Starting experiment evaluation...")
-        scores = experiment(datasetname=datasetname, n_splits=n_splits, n_repeats=n_repeats, measure_time=measure_time, result_name=result_name)
+        scores = experiment(datasetname=datasetname, n_splits=args.n_splits, n_repeats=args.n_repeats, measure_time=measure_time, result_name=args.result_name, save=save)
         logger.info("Experiment evaluation has been done.")
 
     if args.statistic_test:
-        if "scores" not in locals() or "scores" not in globals():
-            scores = np.load(args.read_score)
-        statistic_test(scores, tablename=tablename, alpha=alpha)
+        if "scores" not in locals() and "scores" not in globals():
+            scores = np.load(args.read_scores)
+        logger.info("Starting statistic evaluation...")
+        statistic_test(scores, tablename=args.tablename, alpha=args.alpha)
+        logger.info("Statistic evaluation has been done.")
 
 
 if __name__ == "__main__":

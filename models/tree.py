@@ -17,4 +17,3 @@ class DecisionTreeRegressor(CART):
         if self.feature_selection:
             X = self.fs.transform(X)
         return super().predict(X)
-        

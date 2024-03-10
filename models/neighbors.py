@@ -17,5 +17,4 @@ class KNeighborsRegressor(KNN):
     def predict(self, X):
         if self.feature_selection:
             X = self.fs.transform(X)
-        return super().predict(X)
-        
+        return super().predict(X)       

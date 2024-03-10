@@ -1,8 +1,8 @@
 from sklearn.ensemble import RandomForestRegressor as RF
 from helpers.feature_selection import FeatureSelection
 
-class RandomForestRegresor(RF):
-    def __init__(self, feature_selection: bool=True, random_state=None, **kwargs):
+class RandomForestRegressor(RF):
+    def __init__(self, feature_selection: bool=False, random_state=None, **kwargs):
         super().__init__(random_state=random_state, **kwargs)
         self.feature_selection = feature_selection
     

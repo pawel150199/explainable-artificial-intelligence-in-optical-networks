@@ -2,7 +2,7 @@ from sklearn.neighbors import KNeighborsRegressor as KNN
 from helpers.feature_selection import FeatureSelection
 
 class KNeighborsRegressor(KNN):
-    def __init__(self, feature_selection: bool=True, random_state=None, **kwargs):
+    def __init__(self, feature_selection: bool=False, random_state=None, **kwargs):
         super().__init__(random_state=random_state, **kwargs)
         self.feature_selection = feature_selection
     

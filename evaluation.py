@@ -8,12 +8,20 @@ from tabulate import tabulate
 from scipy.stats import ttest_ind
 from sklearn.metrics import mean_absolute_percentage_error
 
-from sklearn.svm import SVR
-from sklearn.tree import DecisionTreeRegressor
-from sklearn.neighbors import KNeighborsRegressor
-from sklearn.linear_model import LinearRegression
+
 from sklearn.model_selection import RepeatedKFold
-from sklearn.ensemble import RandomForestRegressor
+
+from models.svm import SVR
+from models.tree import DecisionTreeRegressor
+from models.neighbors import KNeighborsRegressor
+from models.linear import LinearRegression
+from models.ensemble import RandomForestRegressor
+
+#from sklearn.svm import SVR
+#from sklearn.tree import DecisionTreeRegressor
+#from sklearn.neighbors import KNeighborsRegressor
+#from sklearn.linear_model import LinearRegression
+#from sklearn.ensemble import RandomForestRegressor
 
 from helpers.loggers import configureLogger
 from helpers.import_data import import_data

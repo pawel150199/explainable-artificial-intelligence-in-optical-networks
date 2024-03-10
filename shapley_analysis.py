@@ -13,7 +13,6 @@ from sklearn.ensemble import RandomForestRegressor
 
 
 from helpers.import_data import import_data
-from helpers.loggers import configureLogger
 
 RANDOM_STATE = 42
 
@@ -23,27 +22,35 @@ def plot_shapley_values(dataset: str, estimator: Any, image_name: str, random_st
     
     if image_name is None:
         image_name = "shapley"
+    
+    parameters = [
+        "highestSlot",
+        "avgHighestSlot",
+        "sumOfSlots",
+        "avgActiveTransceivers",
+    ]
 
     X, y = import_data(dataset)
     X_t = X.reshape((100, 300))
-    y_t = y[:,0]
-    X_train, _, y_train, _ = train_test_split(X_t, y_t, test_size=0.33, random_state=RANDOM_STATE)
+    for i in range(len(parameters)):
+        y_t = y[:,0]
+        X_train, _, y_train, _ = train_test_split(X_t, y_t, test_size=0.33, random_state=RANDOM_STATE)
 
 
-    regr = estimator()
-    fitted = regr.fit(X_train, y_train)
-    x_df = pd.DataFrame(X_t)
-    column_names = [f"{'source' if i % 3 == 0 else 'destination' if i % 3 == 1 else 'bitrate'}{i // 3}" for i in range(len(x_df.columns))]
-    x_df.columns = column_names
-    shap.initjs()
-    ex = shap.KernelExplainer(fitted.predict,X_t)
-    shap_values = ex.shap_values(x_df)
-    shap.summary_plot(shap_values, x_df, max_display=5, show=False)
-    fig = plt.gcf()
-    fig.savefig(f'{image_name}.png')
-    plt.close(fig)
+        regr = estimator()
+        fitted = regr.fit(X_train, y_train)
+        x_df = pd.DataFrame(X_t)
+        column_names = [f"{'source' if i % 3 == 0 else 'destination' if i % 3 == 1 else 'bitrate'}{i // 3}" for i in range(len(x_df.columns))]
+        x_df.columns = column_names
+        shap.initjs()
+        ex = shap.KernelExplainer(fitted.predict,X_t)
+        shap_values = ex.shap_values(x_df)
+        shap.summary_plot(shap_values, x_df, max_display=5, show=False)
+        fig = plt.gcf()
+        fig.savefig(f'images/{image_name}-{parameters[i]}.png')
+        plt.close(fig)
 
-    #shap.plots.violin(shap_values, x_df, show=False)
+        #shap.plots.violin(shap_values, x_df, show=False)
 
 def get_parameters():
     parser = argparse.ArgumentParser()
@@ -74,7 +81,7 @@ def get_parameters():
     return parser.parse_args()
 
 def main():
-    logger = configureLogger()
+    args = get_parameters()
     plot_shapley_values(dataset="Euro28", estimator=LinearRegression, image_name=None, random_state=RANDOM_STATE)
 
 if __name__ == "__main__":

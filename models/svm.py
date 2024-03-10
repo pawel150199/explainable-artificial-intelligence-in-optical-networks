@@ -18,3 +18,4 @@ class SVR(SVROriginal):
         if self.feature_selection:
             X = self.fs.transform(X)
         return super().predict(X)
+        

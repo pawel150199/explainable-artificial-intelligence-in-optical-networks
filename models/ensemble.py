@@ -17,6 +17,3 @@ class RandomForestRegressor(RF):
         if self.feature_selection:
             X = self.fs.transform(X)
         return super().predict(X)
-
-
-    

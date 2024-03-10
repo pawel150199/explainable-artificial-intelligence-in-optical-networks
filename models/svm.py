@@ -3,8 +3,9 @@ from helpers.feature_selection import FeatureSelection
 
 class SVR(SVROriginal):
     def __init__(self, feature_selection: bool=False, random_state=None, **kwargs):
-        super().__init__(random_state=random_state, **kwargs)
+        super().__init__(**kwargs)
         self.feature_selection = feature_selection
+        self.random_state = random_state
     
     def fit(self, X, y, sample_weight=None):
         if self.feature_selection:

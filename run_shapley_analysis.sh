@@ -34,7 +34,7 @@ python3 shapley_analysis.py --dataset Euro28 --estimator KNeighborsRegression --
 check_status
 
 info "Run shapley analysis for RandomForestRegressor estimator."
-python3 shapley_analysis.py --dataset Euro28 --estimator RandomForestRegressor --image_name euro28_knn 2>/dev/null
+python3 shapley_analysis.py --dataset Euro28 --estimator RandomForestRegressor --image_name euro28_rf 2>/dev/null
 check_status
 
 
@@ -56,5 +56,5 @@ python3 shapley_analysis.py --dataset US26 --estimator KNeighborsRegression --im
 check_status
 
 info "Run shapley analysis for RandomForestRegressor estimator."
-python3 shapley_analysis.py --dataset US26 --estimator RandomForestRegressor --image_name euro28_knn 2>/dev/null
+python3 shapley_analysis.py --dataset US26 --estimator RandomForestRegressor --image_name euro28_rf 2>/dev/null
 check_status

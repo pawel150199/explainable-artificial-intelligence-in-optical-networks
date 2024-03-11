@@ -1,5 +1,6 @@
 import shap
 import argparse
+import numpy as np
 import pandas as pd
 from typing import Any
 import matplotlib.pyplot as plt
@@ -16,10 +17,7 @@ from helpers.import_data import import_data
 
 RANDOM_STATE = 42
 
-def plot_shapley_values(dataset: str, estimator: Any, image_name: str, random_state: int=None):
-    if estimator is None:
-        estimator_name = "LinearRegression"
-        estimator = LinearRegression
+def plot_feature_selection(dataset: str, image_name: str, random_state: int=None):
     
     if image_name is None:
         image_name = "shapley"
@@ -31,17 +29,6 @@ def plot_shapley_values(dataset: str, estimator: Any, image_name: str, random_st
         "avgActiveTransceivers",
     ]
 
-    estimators = {
-        "SVR": SVR,
-        "LinearRegression": LinearRegression,
-        "KNeighborsRegressor": KNeighborsRegressor,
-        "DecisionTreeRegressor": DecisionTreeRegressor,
-        "RandomForestRegressor": RandomForestRegressor,
-    }
-
-    estimator_name = estimator
-    estimator = estimators[estimator]
-
     X, y = import_data(dataset)
     X_t = X.reshape((100, 300))
     for i in range(len(parameters)):
@@ -49,22 +36,30 @@ def plot_shapley_values(dataset: str, estimator: Any, image_name: str, random_st
         X_train, _, y_train, _ = train_test_split(X_t, y_t, test_size=0.33, random_state=RANDOM_STATE)
 
 
-        regr = estimator()
-        fitted = regr.fit(X_train, y_train)
+        tree = DecisionTreeRegressor(random_state=RANDOM_STATE)
+        fitted = tree.fit(X_train, y_train)
         x_df = pd.DataFrame(X_t)
         column_names = [f"{'source' if i % 3 == 0 else 'destination' if i % 3 == 1 else 'bitrate'}{i // 3}" for i in range(len(x_df.columns))]
         x_df.columns = column_names
-        shap.initjs()
-        ex = shap.KernelExplainer(fitted.predict,X_t)
-        shap_values = ex.shap_values(x_df)
-        shap.summary_plot(shap_values, x_df, max_display=10, show=False)
-        plt.title(f"Shapley analysis for {str(estimator_name)} - {parameters[i]}")
+        indices_of_highest_values = sorted(range(len(fitted.feature_importances_)), key=lambda i: fitted.feature_importances_[i], reverse=True)[:10]
+        x_df = x_df.iloc[:, indices_of_highest_values]
+        feature_importance = fitted.feature_importances_[indices_of_highest_values]
+
+        
+        fig, ax = plt.subplots()
+        y_pos = np.arange(len(feature_importance))
+        ax.barh(y_pos, 
+            feature_importance,
+            color='tomato'
+        )
+        ax.set_yticks(y_pos)
+        ax.set_yticklabels(x_df.columns)
+        ax.set_xlabel('Feature Importance')
+        plt.title(f"Feature importances analysis for {parameters[i]} parameter")
         plt.tight_layout()
         fig = plt.gcf()
         fig.savefig(f'images/{image_name}_{parameters[i]}.png')
         plt.close(fig)
-
-        #shap.plots.violin(shap_values, x_df, show=False)
 
 def get_parameters():
     parser = argparse.ArgumentParser()
@@ -78,14 +73,6 @@ def get_parameters():
     )
 
     parser.add_argument(
-        "--estimator",
-        "-e",
-        help="Estimator path",
-        type=str,
-        choices=["LinearRegression", "RandomForestRegressor", "DecisionTreeRegressor", "KNeighborsRegressor", "SVR"],
-    )
-
-    parser.add_argument(
         "--image_name",
         "-i",
         help="Image name",
@@ -96,7 +83,7 @@ def get_parameters():
 
 def main():
     args = get_parameters()
-    plot_shapley_values(dataset=args.dataset, estimator=args.estimator, image_name=args.image_name, random_state=RANDOM_STATE)
+    plot_feature_selection(dataset=args.dataset, image_name=args.image_name, random_state=RANDOM_STATE)
 
 if __name__ == "__main__":
     main()

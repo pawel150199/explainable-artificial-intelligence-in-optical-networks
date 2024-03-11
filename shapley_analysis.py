@@ -58,7 +58,7 @@ def plot_shapley_values(dataset: str, estimator: Any, image_name: str, random_st
         ex = shap.KernelExplainer(fitted.predict,X_t)
         shap_values = ex.shap_values(x_df)
         shap.summary_plot(shap_values, x_df, max_display=10, show=False)
-        plt.title(f"Shapley analysis for {str(estimator_name) - {parameters[i]}}")
+        plt.title(f"Shapley analysis for {str(estimator_name)} - {parameters[i]}")
         plt.tight_layout()
         fig = plt.gcf()
         fig.savefig(f'images/{image_name}_{parameters[i]}.png')

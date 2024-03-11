@@ -29,8 +29,8 @@ info "Run shapley analysis for DecisionTreeRegressor estimator."
 python3 shapley_analysis.py --dataset Euro28 --estimator DecisionTreeRegressor --image_name euro28_cart 2>/dev/null
 check_status
 
-info "Run shapley analysis for KNeighborsRegression estimator."
-python3 shapley_analysis.py --dataset Euro28 --estimator KNeighborsRegression --image_name euro28_knn 2>/dev/null
+info "Run shapley analysis for KNeighborsRegressor estimator."
+python3 shapley_analysis.py --dataset Euro28 --estimator KNeighborsRegressor --image_name euro28_knn 2>/dev/null
 check_status
 
 info "Run shapley analysis for RandomForestRegressor estimator."
@@ -51,8 +51,8 @@ info "Run shapley analysis for DecisionTreeRegressor estimator."
 python3 shapley_analysis.py --dataset US26 --estimator DecisionTreeRegressor --image_name euro28_cart 2>/dev/null
 check_status
 
-info "Run shapley analysis for KNeighborsRegression estimator."
-python3 shapley_analysis.py --dataset US26 --estimator KNeighborsRegression --image_name euro28_knn 2>/dev/null
+info "Run shapley analysis for KNeighborsRegressor estimator."
+python3 shapley_analysis.py --dataset US26 --estimator KNeighborsRegressor --image_name euro28_knn 2>/dev/null
 check_status
 
 info "Run shapley analysis for RandomForestRegressor estimator."

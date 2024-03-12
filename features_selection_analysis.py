@@ -42,6 +42,7 @@ def plot_feature_selection(dataset: str, image_name: str, random_state: int=None
         column_names = [f"{'source' if i % 3 == 0 else 'destination' if i % 3 == 1 else 'bitrate'}{i // 3}" for i in range(len(x_df.columns))]
         x_df.columns = column_names
         indices_of_highest_values = sorted(range(len(fitted.feature_importances_)), key=lambda i: fitted.feature_importances_[i], reverse=True)[:10]
+        indices_of_highest_values = indices_of_highest_values[::-1]
         x_df = x_df.iloc[:, indices_of_highest_values]
         feature_importance = fitted.feature_importances_[indices_of_highest_values]
 
@@ -55,7 +56,7 @@ def plot_feature_selection(dataset: str, image_name: str, random_state: int=None
         ax.set_yticks(y_pos)
         ax.set_yticklabels(x_df.columns)
         ax.set_xlabel('Feature Importance')
-        plt.title(f"Feature importances analysis for {parameters[i]} parameter")
+        plt.title(f"Feature importance analysis - {parameters[i]}")
         plt.tight_layout()
         fig = plt.gcf()
         fig.savefig(f'images/{image_name}_{parameters[i]}.png')

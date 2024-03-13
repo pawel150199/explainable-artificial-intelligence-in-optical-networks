@@ -19,7 +19,6 @@ Run `evaluation.py` script with specific options.
 
 In case of run all experiment you can run `run_experiment.sh` script
 
-<br></br>
 
 ### Shapley analysis
 Run `shapley_analysis.py` script with specific options.
@@ -28,14 +27,12 @@ Run `shapley_analysis.py` script with specific options.
 
 To run all shapley analysis experiments `run_shapley_analysis.sh`
 
-<br></br>
 
 ### Feature importance
 Run `feature_importance_analysis.py` script with specific options.
 <br></br>
 ![feature_importance](./images/feature_importance_analysis.png)
 
-<br></br>
 
 ## Troubleshooting
 If you have issue with modules using in this code export enviroment variable which can fix your issue:

@@ -45,7 +45,7 @@ parameters = [
 
 metrics = {"MAPE": mean_absolute_percentage_error}
 
-def experiment(datasetname: str, n_splits: int, n_repeats: int, result_name: str, save: bool, measure_time: bool):
+def experiment(datasetname: str, n_splits: int, n_repeats: int, result_name: str, save: bool, measure_time: bool, tablename: str, save_as_table: bool=True):
 
     if n_splits is None:
         n_splits = 5
@@ -92,15 +92,39 @@ def experiment(datasetname: str, n_splits: int, n_repeats: int, result_name: str
                 clf.fit(X_train, y_train)
                 y_pred = clf.predict(X_test)
                 end = time.time()
-                for metric_id, metric_name in enumerate(metrics):
-                    # PARAM X FOLD X CLASSIFIER X METRIC
-                    if measure_time:
-                        scores[param_id, fold_id, clf_id, metric_id] = end - start
-                    else:
+                if measure_time:
+                    scores[param_id, fold_id, clf_id] = end - start
+                else:
+                    for metric_id, metric_name in enumerate(metrics):
+                        # PARAM X FOLD X CLASSIFIER X METRIC
                         scores[param_id, fold_id, clf_id, metric_id] = metrics[metric_name](y_test, y_pred)
 
     if save:
         np.save(f"results/{result_name}", scores)
+    
+    if save_as_table and measure_time:
+        mean_score = scores.mean(axis=1)
+        db_fmt="%s"
+        headers = clfs.keys()
+        n_clfs = len(clfs.keys())
+        table = []
+
+        for param_idx, param_name in enumerate(parameters):
+            table.append([db_fmt % param_name] + ["%.3f" % v for v in mean_score[param_idx, :]])
+            T, p = np.array(
+                [[ttest_ind(scores[param_idx, :, i],
+                    scores[param_idx, :, j], random_state=RANDOM_STATE)
+                for i in range(len(clfs))]
+                for j in range(len(clfs))]
+            ).swapaxes(0, 2)
+
+        headers = ["Parameter"]
+        for i in clfs:
+            headers.append(i)
+        print(tabulate(table, headers, tablefmt="grid"))
+
+        with open("tables/%s.txt" % (tablename), "w") as f:
+            f.write(tabulate(table, headers, tablefmt="latex"))
 
     return scores
 
@@ -166,8 +190,7 @@ def get_parameters():
         "--statistic_test",
         "-s",
         help="Do statistic test",
-        action='store_true',
-        required=True
+        action='store_true'
     )
 
     parser.add_argument(
@@ -222,6 +245,12 @@ def get_parameters():
     )
 
     parser.add_argument(
+        "--tablename_measurment_time",
+        help="Name of generated table of time measurment",
+        type=str
+    )
+
+    parser.add_argument(
         "--save_results",
         action='store_true',
         help="Save result of experiment evaluation"
@@ -259,7 +288,7 @@ def main():
 
     if args.evaluation:
         logger.info("Starting experiment evaluation...")
-        scores = experiment(datasetname=datasetname, n_splits=args.n_splits, n_repeats=args.n_repeats, measure_time=measure_time, result_name=args.result_name, save=save)
+        scores = experiment(datasetname=datasetname, n_splits=args.n_splits, n_repeats=args.n_repeats, measure_time=measure_time, result_name=args.result_name, save=save, tablename=args.tablename_measurment_time)
         logger.info("Experiment evaluation has been done.")
 
     if args.statistic_test:

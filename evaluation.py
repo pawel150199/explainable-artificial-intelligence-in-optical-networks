@@ -10,30 +10,35 @@ from sklearn.metrics import mean_absolute_percentage_error
 
 from sklearn.model_selection import RepeatedKFold
 
-from models.svm import SVR
-from models.tree import DecisionTreeRegressor
-from models.neighbors import KNeighborsRegressor
-from models.linear import LinearRegression
-from models.ensemble import RandomForestRegressor
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.svm import SVR
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.neural_network import MLPRegressor
+from sklearn.linear_model import LinearRegression
 from helpers.loggers import configureLogger
 from helpers.import_data import import_data
+
+from helpers.feature_selection import FeatureSelection
 
 
 warnings.filterwarnings("ignore")
 
 RANDOM_STATE = 1410
 
+feature_selection_clfs = ["CART-FS", "SVR-FS", "KNN-FS", "RF-FS", "LR-FS"]
+
 clfs = {
     "CART" : DecisionTreeRegressor(random_state=RANDOM_STATE),
-    "SVR" : SVR(random_state=RANDOM_STATE, kernel="poly"),
-    "KNN" : KNeighborsRegressor(random_state=RANDOM_STATE),
+    "SVR" : SVR(kernel="poly"),
+    "KNN" : KNeighborsRegressor(),
     "RF" : RandomForestRegressor(random_state=RANDOM_STATE),
-    "LR" : LinearRegression(random_state=RANDOM_STATE),
-    "CART-FS" : DecisionTreeRegressor(random_state=RANDOM_STATE, feature_selection=True),
-    "SVR-FS" : SVR(random_state=RANDOM_STATE, kernel="poly", feature_selection=True),
-    "KNN-FS" : KNeighborsRegressor(random_state=RANDOM_STATE, feature_selection=True),
-    "RF-FS" : RandomForestRegressor(random_state=RANDOM_STATE, feature_selection=True),
-    "LR-FS" : LinearRegression(random_state=RANDOM_STATE, feature_selection=True),
+    "LR" : LinearRegression(),
+    "CART-FS" : DecisionTreeRegressor(random_state=RANDOM_STATE),
+    "SVR-FS" : SVR(kernel="poly"),
+    "KNN-FS" : KNeighborsRegressor(),
+    "RF-FS" : RandomForestRegressor(),
+    "LR-FS" : LinearRegression(),
 }
 
 parameters = [
@@ -87,15 +92,20 @@ def experiment(datasetname: str, n_splits: int, n_repeats: int, result_name: str
                 X_test = X[test].reshape((len(test), 300))
                 X_train = X[train].reshape((len(train), 300))
                 y_test, y_train = y_selected[test], y_selected[train]
+                if clf_name in feature_selection_clfs:
+                    fs = FeatureSelection(random_state=RANDOM_STATE)
+                    fs.fit(X_train, y_train)
+                    X_train = fs.transform(X_train)
+                    X_test = fs.transform(X_test)
                 start = time.time()
                 clf = clfs[clf_name]
                 clf.fit(X_train, y_train)
                 y_pred = clf.predict(X_test)
                 end = time.time()
-                if measure_time:
-                    scores[param_id, fold_id, clf_id] = end - start
-                else:
-                    for metric_id, metric_name in enumerate(metrics):
+                for metric_id, metric_name in enumerate(metrics):
+                    if measure_time:
+                        scores[param_id, fold_id, clf_id, metric_id] = end - start
+                    else:
                         # PARAM X FOLD X CLASSIFIER X METRIC
                         scores[param_id, fold_id, clf_id, metric_id] = metrics[metric_name](y_test, y_pred)
 
